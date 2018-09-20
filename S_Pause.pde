@@ -1,45 +1,46 @@
 class Pause extends State {
-  Game pausedGame;
-  Pause(State currentGame) {
-    super("Paused");
-    pausedGame = (Game)currentGame;
-    overworld.pause();
-    button = new Button[3];
+  Pause() {
+    super("Pause");
+    button = new Button[4];
+    // Enter the controls menu.
     button[0] = new Button(80, 80, 96, 32, "Controls", new ButtonAction() {
-      @Override public void click() {
-        playAudio(hitFX);
+      @Override void click() {
+        state = new Controls();
       }
     }
     );
-    button[1] = new Button(80, 144, 96, 32, "Screen: "+SCALE, new ButtonAction() {
-      @Override public void click() {
-        playAudio(buttonFX);
-        SCALE += 4;
-        if (SCALE*16>=displayWidth||SCALE*16>=displayHeight) SCALE = 8;
-        surface.setSize(16*SCALE, 16*SCALE);
-        delay(50);
-        noLoop();
-        loop();
-        button[1].text = "Screen: "+SCALE;
+    // Enter the inventory menu.
+    button[1] = new Button(80, 144, 96, 32, "Inventory", new ButtonAction() {
+      @Override void click() {
+        state = new Inventory();
       }
     }
     );
-    button[2] = new Button(80, 208, 96, 32, "Exit", new ButtonAction() {
+    // Reload the level (equivalent of savewarping).
+    button[2] = new Button(16, 208, 96, 32, "Restart Level", new ButtonAction() {
+      void click() {
+        playSound(FXpause);
+        state = new Game();
+        frameCount = -15;
+      }
+    }
+    );
+    // Save progress, and return to the title screen.
+    button[3] = new Button(144, 208, 96, 32, "Quit", new ButtonAction() {
       @Override public void click() {
-        playAudio(buttonFX);
-        gf.fileSave();
+        gameFile.saveFile();
+        gameFile = null;
         state = new Title();
       }
     }
     );
   }
+
+  // Return to the game.
   void keyPress() {
-    if (key == ' ') {
-      overworld.loop();
-      playAudio(pauseFX);
-      surface.setTitle(pausedGame.txt.replace("\n", "  "));
-      Pause temp = (Pause)state;
-      state = temp.pausedGame;
+    if (key==ESC) {
+      playSound(FXpause);
+      state = new Game();
     }
   }
 }

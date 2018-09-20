@@ -1,81 +1,39 @@
-final char KEY_UP = 'w', KEY_LEFT = 'a', KEY_DOWN = 's', KEY_RIGHT = 'd', KEY_INTERACT = 'q', KEY_ATTACK = 'e';
+// I use a HashMap (equivalent of a dictionary) to store the keys.
 HashMap<Character, Boolean> keys = new HashMap<Character, Boolean>();
 
-char[] keyHistory = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+// The player can bind keys, so I store them as variables.
+char KEY_UP = 'w', KEY_LEFT = 'a', KEY_DOWN = 's', KEY_RIGHT = 'd', 
+  KEY_INTERACT = 'q', KEY_ATTACK = 'e';
 
-
-boolean konami = false;
-
+// When the controls change, reset the HashMap.
 void setKeys() {
   keys = new HashMap<Character, Boolean>();
-  // Initialize the keys.
   keys.put(KEY_UP, false);
   keys.put(KEY_LEFT, false);
-  keys.put(KEY_RIGHT, false);
   keys.put(KEY_DOWN, false);
+  keys.put(KEY_RIGHT, false);
   keys.put(KEY_INTERACT, false);
   keys.put(KEY_ATTACK, false);
 }
 
+// When keyboard events occur, update the HashMap.
 void keyPressed() {
-  if (key == CODED) {
-    if (keyCode == UP) {
-      key = KEY_UP;
-    } else if (keyCode == DOWN) {
-      key = KEY_DOWN;
-    } else if (keyCode == LEFT) {
-      key = KEY_LEFT;
-    } else if (keyCode == RIGHT) {
-      key = KEY_RIGHT;
-    }
-  }
   key = Character.toLowerCase(key);
-  state.keyPress();
-  try {
-    @SuppressWarnings("unused")
-      boolean temp = keys.get(key);
-    keys.put(key, true);
-  }
-  catch (NullPointerException e) {
-  }
-  for (int i = 0; i < 9; ++i) {
-    keyHistory[i] = keyHistory[i+1];
-  }
-  keyHistory[9] = key;
-  if (Arrays.toString(keyHistory).equals("[u, u, d, d, l, r, l, r, b, a]")) {
-    konami = !konami;
-  }
+  // If the key has been bound, update the HashMap.
+  if (keys.containsKey(key)) keys.put(key, true);
+  // Pass key presses (not releases) to the state-specific function.
+  if (frameCount > 15) state.keyPress();
+  // Catch the escape key before Processing can.
+  if (key == DELETE) save(frameCount+".png");
+  if (key == ESC) key = ' ';
 }
-
 void keyReleased() {
-  if (key == CODED) {
-    if (keyCode == UP) {
-      key = KEY_UP;
-    } else if (keyCode == DOWN) {
-      key = KEY_DOWN;
-    } else if (keyCode == LEFT) {
-      key = KEY_LEFT;
-    } else if (keyCode == RIGHT) {
-      key = KEY_RIGHT;
-    }
-  }
   key = Character.toLowerCase(key);
-  try {
-    @SuppressWarnings("unused")
-      boolean temp = keys.get(key);
-    keys.put(key, false);
-  }
-  catch (NullPointerException e) {
-  }
+  // If the key has been bound, update the HashMap.
+  if (keys.containsKey(key)) keys.put(key, false);
 }
 
-//void mousePressed() {
-//  if (state instanceof Game) {
-//    frameRate(3);
-//  }
-//}
-//void mouseReleased() {
-//  if (state instanceof Game) {
-//    frameRate(60);
-//  }
-//}
+void mouseReleased() {
+  // Pass mouse releases (not presses) to the state-specific function.
+  if (frameCount > 15) state.mouseRelease();
+}

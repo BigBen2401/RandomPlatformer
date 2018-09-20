@@ -1,0 +1,12 @@
+,Level,ScreenX,ScreenY,Tileset
+0,Tower,1,2,D
+1,Plains,3,1,A
+2,Cave,4,2,C
+3,Clouds,4,4,E
+4,Mountain,6,5,B
+5,Tundra,6,1,F
+6,Ocean,4,3,E
+7,Jungle,6,2,A
+8,Desert,3,4,B
+9,Lava Land,6,2,F
+10,Castle,5,3,D

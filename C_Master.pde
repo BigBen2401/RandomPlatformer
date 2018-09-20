@@ -1,16 +1,20 @@
-class MasterObject {
+// All other classes within the game are subtypes of this, for inheritance.
+abstract class MasterObject {
+
+  // Properties that all classes need, and the constructor to set them.
   Vector pos, size;
-  PImage img = null;
   boolean dead = false;
   MasterObject(float x, float y, float w, float h) {
     pos = new Vector(x*16, y*16);
     size = new Vector(w*16, h*16);
   }
-  void run() {
-    int thisAlgorithmBecomingSkynetCost = 999999999;
-  }
-  void display() {
-  }
+
+  // All classes need to run their logic, and display some image to the screen.
+  abstract void run();
+  abstract void display();
+  abstract PImage getIMG();
+
+  // All classes need to consider what happens on collision.
   void checkColP(Player p) {
     switch (touch(p)) {
     case -1:
@@ -29,51 +33,54 @@ class MasterObject {
       break;
     }
   }
-  @SuppressWarnings("unused")
-    protected void floorColP(Player p) {
-  }
-  @SuppressWarnings("unused")
-    protected void ceilColP(Player p) {
-  }
-  @SuppressWarnings("unused")
-    protected void rwallColP(Player p) {
-  }
-  @SuppressWarnings("unused")
-    protected void lwallColP(Player p) {
-  }
   void checkColE(ArrayList<MasterEntity> al) {
-    for (MasterEntity o : al) {
-      switch (touch(o)) {
+    for (MasterEntity e : al) {
+      switch (touch(e)) {
       case -1:
         break;
       case 1:
-        floorColE(o);
+        floorColE(e);
         break;
       case 2:
-        ceilColE(o);
+        ceilColE(e);
         break;
       case 3:
-        rwallColE(o);
+        rwallColE(e);
         break;
       case 4:
-        lwallColE(o);
+        lwallColE(e);
         break;
       }
     }
   }
-  @SuppressWarnings("unused")
-    protected void floorColE(MasterEntity o) {
+  // Some classes don't care about some types of collisions, so they need an empty method,
+  @SuppressWarnings("unused")  
+    void floorColP(Player p) {
   }
   @SuppressWarnings("unused")
-    protected void ceilColE(MasterEntity o) {
+    void ceilColP(Player p) {
   }
   @SuppressWarnings("unused")
-    protected void rwallColE(MasterEntity o) {
+    void rwallColP(Player p) {
   }
   @SuppressWarnings("unused")
-    protected void lwallColE(MasterEntity o) {
+    void lwallColP(Player p) {
   }
-  float getTop() { 
+  @SuppressWarnings("unused")
+    void floorColE(MasterEntity e) {
+  }
+  @SuppressWarnings("unused")
+    void ceilColE(MasterEntity e) {
+  }
+  @SuppressWarnings("unused")
+    void rwallColE(MasterEntity e) {
+  }
+  @SuppressWarnings("unused")
+    void lwallColE(MasterEntity e) {
+  }
+
+  // Get various useful coordinates.
+  float getTop() {
     return pos.y;
   }
   float getBottom() {
@@ -91,59 +98,72 @@ class MasterObject {
   float getMiddleY() {
     return pos.y+size.y/2;
   }
+
+  // Get the type (if any) of collision with another object.
   int touch(MasterObject o) {
-    if (o != null && o != this 
+    // If o is a different object to this, and is intersecting this.
+    if (o != null && o != this
       && getBottom() >= o.getTop() && getTop() <= o.getBottom()
       && getRight() >= o.getLeft() && getLeft() <= o.getRight()) {
+      // Look at the angle ranges, as defined in the report.
       float angO = atan2(o.getMiddleY()-getMiddleY(), o.getMiddleX()-getMiddleX());
       float angTR = atan2(getTop()-getMiddleY(), getRight()-getMiddleX());
       float angBR = atan2(getBottom()-getMiddleY(), getRight()-getMiddleX());
       float angTL = atan2(getTop()-getMiddleY(), getLeft()-getMiddleX());
       float angBL = atan2(getBottom()-getMiddleY(), getLeft()-getMiddleX());
-      if (angO >= angTL && angO <= angTR) return 1; // on TOP
-      else if (angO >= angBR && angO <= angBL) return 2; // on BOTTOM
-      else if (angO >= angTR && angO <= angBR) return 3; // on RIGHT
-      else return 4; // on LEFT
-    } else {
-      return -1; // NOT TOUCHING
+      // o is above this.
+      if (angO >= angTL && angO <= angTR) return 1;
+      // o is below this
+      else if (angO >= angBR && angO <= angBL) return 2;
+      // o is to the right of this
+      else if (angO >= angTR && angO <= angBR) return 3;
+      // o is to the left of this
+      else return 4;
     }
+    // o is not touching this
+    else return -1;
   }
 }
 
-class MasterEntity extends MasterObject {
+// Some things are exclusive to entities.
+abstract class MasterEntity extends MasterObject {
+
   Vector vel = new Vector(0, 0);
-  boolean ground = true, attack = false;
+  boolean attack = false, ground = true;
+
   MasterEntity(float x, float y, float w, float h) {
     super(x, y, w, h);
   }
+
   void display() {
-    if (img == null) {
-      pg.fill(255, 127);
-      pg.stroke(0);
+    try {
+      pg.image(getIMG(), pos.x, pos.y, size.x, size.y);
+    } 
+    catch (NullPointerException e) {
+      pg.fill(#ff6a00);
       pg.rect(pos.x, pos.y, size.x, size.y);
-      pg.noStroke();
-    } else {
-      pg.image(img, pos.x, pos.y, size.x, size.y);
     }
   }
 }
 
-class MasterGeometry extends MasterObject {
+// Some things are exclusive to geometry.
+abstract class MasterGeometry extends MasterObject {
+
   MasterGeometry(float x, float y, float w, float h) {
     super(x, y, w, h);
   }
+
   void display() {
-    if (img == null) {
-      pg.fill(255, 127);
-      pg.stroke(0);
-      pg.rect(pos.x, pos.y, size.x, size.y);
-      pg.noStroke();
-    } else {
+    try {
       for (int i = 0; i < size.x; i += 16) {
         for (int j = 0; j < size.y; j += 16) {
-          pg.image(img, pos.x+i, pos.y+j, 16, 16);
+          pg.image(getIMG(), pos.x+i, pos.y+j, 16, 16);
         }
       }
+    } 
+    catch (NullPointerException e) {
+      pg.fill(#3fff00);
+      pg.rect(pos.x, pos.y, size.x, size.y);
     }
   }
 }
