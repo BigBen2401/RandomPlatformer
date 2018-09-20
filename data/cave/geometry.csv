@@ -1,0 +1,24 @@
+Type,X Pos,Y Pos,Width,Height,Comment
+-1,4,2,0,0,Metadata
+0,-2,-2,3,36,Border
+0,63,-2,3,36,Border
+0,0,-2,64,3,Border
+0,0,31,64,3,Border
+0,31,3,2,22,Divider
+0,32,15,32,2,Divider
+0,49,13,15,2,Entrance
+0,59,9,2,7,Entrance
+0,60,11,4,4,Entrance
+2,55,11,2,2,plains
+0,49,9,3,7,Overhang
+0,48,6,3,10,Overhang
+0,40,5,10,2,Overhang
+0,40,6,2,2,Overhang
+0,39,6,2,7,Overhang
+0,40,10,6,2,Overhang
+0,43,11,2,2,Overhang
+0,32,14,2,5,Decor
+0,34,0,1,7,Decor
+0,35,0,1,6,Decor
+0,57,0,7,3,Decor
+0,61,0,3,5,Decor
